@@ -5,7 +5,27 @@ library(bibliometrix)
 library(textmineR)
 library(dplyr)
 library(ggplot2)
+library(tidytext)
 
+library(dplyr)
+library(bibliometrix)
+library(openxlsx)
+library(data.table)
+library(ggplot2)
+library(ggthemes) # Load
+library(openxlsx)
+library(readr)
+library(tidyverse)
+library(writexl)
+library(countrycode)
+library(quanteda)
+library(topicmodels)
+library(wordcloud)
+library(quanteda.textstats)
+library(ggplot2)
+library(ggthemes) # Load
+library(textmineR)
+library(tidytext)
 #1 Selecting sample
 
 #1.1 Importing bibtex file and converting it into dataframe
@@ -80,9 +100,16 @@ dtm_2_3 <- CreateDtm(doc_vec = SDG_terms$V1,
                    cpus = 2) 
 
 
-tf <- TermDocFreq(dtm = dtm)
+tf_1_2 <- TermDocFreq(dtm = dtm_1_2)
 tf_2 <- TermDocFreq(dtm = dtm_2)
-tf_3 <- TermDocFreq(dtm = dtm_3)
+tf_2_3 <- TermDocFreq(dtm = dtm_2_3)
+
+
+
+# Opening search file
+setwd("C:/Users/6674828/OneDrive - Universiteit Utrecht/SDG-UU/Sustainability-repository/Analysis")
+
+search = read.csv("search.csv")
 
 
 # Unspervised machine learning model (LDA)
@@ -94,16 +121,14 @@ stopwords <- stopwords$a
 
 #Creating dtm (TextmineR)
 dtm <- CreateDtm(doc_vec = sample$AB, doc_names = sample$UT,
-                        ngram_window = c(2, 3), 
-                 stopword_vec = c(stopwords, stopwords('en')),
-                        remove_numbers = TRUE,
-                        remove_punctuation = F,
-                        verbose = FALSE, 
-                        cpus = 2)
+                 ngram_window = c(2, 2),
+                 stopword_vec =  c(stopwords::stopwords("en"), stopwords),
+                 remove_numbers = TRUE,
+                 remove_punctuation = F,
+                 verbose = FALSE, 
+                 cpus = 2)
 
-dtm <- CreateDtm(doc_vec = sample$AB, doc_names = sample$UT,
-                 stopword_vec = c(stopwords, stopwords("en")),
-                 remove_punctuation = F)
+
 
 tf_sample <- TermDocFreq(dtm = dtm)
 
@@ -143,4 +168,37 @@ ggplot(coherence_mat, aes(x = k, y = coherence)) +
   ggtitle("Best Topic by Coherence Score") + theme_minimal() +
   scale_x_continuous(breaks = seq(1,20,1)) + ylab("Coherence")
 
+model <- model_list[which.max(coherence_mat$coherence)][[ 1 ]]
+model$top_terms <- GetTopTerms(phi = model$phi, M = 20)
+top20_wide <- as.data.frame(model$top_terms)
+
+
+####Visualization https://www.kaggle.com/spiliopoulos/topic-modeling-lda-gibbs-v1
+tidy_beta <- data.frame(topic = as.integer(stringr::str_replace_all(rownames(model$phi), "t_", "")), 
+                        model$phi, stringsAsFactors = FALSE) %>%
+  gather(term, beta, -topic) %>% 
+  tibble::as_tibble()
+
+top_terms <- tidy_beta %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 10) %>% 
+  ungroup() %>%
+  arrange(topic, -beta)
+
+
+f <- function(x){
+  format(round(x, 2), nsmall=2)
+}
+
+dev.new(width=14, height=10) #not run
+setwd("C:/Users/6674828/OneDrive - Universiteit Utrecht/SDG-UU/Sustainability-repository/Analysis")
+png("topics.png", width = 1200, height = 1800, res = 120)
+top_terms %>% 
+  mutate(term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free", nrow = 3)+
+  scale_y_reordered()+
+  scale_x_continuous(labels = f, n.breaks = 4)
+dev.off()
 
