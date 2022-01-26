@@ -20,12 +20,14 @@ setwd("C:/Users/6674828/OneDrive - Universiteit Utrecht/SDG-UU/Sustainability-re
 write.csv(sample, 'sample.csv')
 
 
-#1.4 Opening sample
+#1.4 Opening sample (do not run)
 setwd("C:/Users/6674828/OneDrive - Universiteit Utrecht/SDG-UU/Sustainability-repository/Analysis")
 data = read.csv("output - Copy.csv")
 sample = data[round(runif(100, min = 0, max = 1000),0),]
 setwd("C:/Users/6674828/OneDrive - Universiteit Utrecht/SDG-UU/Sustainability-repository/Analysis")
 write.csv(sample, 'output.csv', row.names = F)
+
+#run
 sample = read.csv("output.csv")
 
 
@@ -93,11 +95,15 @@ stopwords <- stopwords$a
 #Creating dtm (TextmineR)
 dtm <- CreateDtm(doc_vec = sample$AB, doc_names = sample$UT,
                         ngram_window = c(2, 3), 
-                        stopword_vec = c(stopwords, stopwords("en")),
+                 stopword_vec = c(stopwords, stopwords('en')),
                         remove_numbers = TRUE,
                         remove_punctuation = F,
                         verbose = FALSE, 
                         cpus = 2)
+
+dtm <- CreateDtm(doc_vec = sample$AB, doc_names = sample$UT,
+                 stopword_vec = c(stopwords, stopwords("en")),
+                 remove_punctuation = F)
 
 tf_sample <- TermDocFreq(dtm = dtm)
 
