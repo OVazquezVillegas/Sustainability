@@ -11,7 +11,6 @@ thesaurus = 'ramirez_thesaurus'
 cores = 1
 
 ###
-setwd("C:/Users/6674828/OneDrive - Universiteit Utrecht/SDG-UU/Sustainability-repository")
 direct=getwd()
 setwd(paste(direct,'Analysis',sep='/'))
 library(textstem);library(tm);library(parallel)
@@ -60,17 +59,17 @@ write.csv(m,paste(output,"Words_Searched.csv",sep='_'),row.names=F)
 # Determine the SDG(s) for each publication
 datas=xtabs(as.numeric(m[,'Freq'])~m[,'UT']+m[,'SDG'])
 datas=cbind(datas,rowSums(datas))
-colnames(datas)=c(paste('SDG', 1:17, sep = '.'),'FreqT');class(datas)='numeric'
+colnames(datas)=c(paste('SDG', c(2,3,4,5,6,8,12,13), sep = '.'),'FreqT');class(datas)='numeric'
 data=data[data[,'UT']%in%rownames(datas),]
 datas=datas[unlist(mclapply(1:dim(data)[1],function(i){which(rownames(datas)==data[i,'UT'])},mc.cores=cores)),]
 data=data.frame(data,datas)
-SDG=unlist(mclapply(1:dim(data)[1],function(i){ifelse(sum(sort(data[i,paste('SDG.',1:17, sep='')]/data[i,'FreqT'],decreasing=T)[1])>.75,
-                                                      paste(names(sort(data[i,paste('SDG.',1:17, sep='')]/data[i,'FreqT'],decreasing=T))[1],collapse='#'),
-                                                      ifelse(sum(sort(data[i,paste('SDG.',1:17, sep='')]/data[i,'FreqT'],decreasing=T)[1:2])>.60,
-                                                             paste(names(sort(data[i,paste('SDG.',1:17, sep='')]/data[i,'FreqT'],decreasing=T))[1:2],collapse='#'),
-                                                             ifelse(sum(sort(data[i,paste('SDG.',1:17, sep='')]/data[i,'FreqT'],decreasing=T)[1:3])>.50,
-                                                                    paste(names(sort(data[i,paste('SDG.',1:17, sep='')]/data[i,'FreqT'],decreasing=T))[1:3],collapse='#'),
-                                                                    paste(names(sort(data[i,paste('SDG.',1:17, sep='')]/data[i,'FreqT'],decreasing=T))[1:3],collapse='#'))))},mc.cores=cores))
+SDG=unlist(mclapply(1:dim(data)[1],function(i){ifelse(sum(sort(data[i,paste('SDG.',c(2,3,4,5,6,8,12,13), sep='')]/data[i,'FreqT'],decreasing=T)[1])>.75,
+                                                      paste(names(sort(data[i,paste('SDG.',c(2,3,4,5,6,8,12,13), sep='')]/data[i,'FreqT'],decreasing=T))[1],collapse='#'),
+                                                      ifelse(sum(sort(data[i,paste('SDG.',c(2,3,4,5,6,8,12,13), sep='')]/data[i,'FreqT'],decreasing=T)[1:2])>.60,
+                                                             paste(names(sort(data[i,paste('SDG.',c(2,3,4,5,6,8,12,13), sep='')]/data[i,'FreqT'],decreasing=T))[1:2],collapse='#'),
+                                                             ifelse(sum(sort(data[i,paste('SDG.',c(2,3,4,5,6,8,12,13), sep='')]/data[i,'FreqT'],decreasing=T)[1:3])>.50,
+                                                                    paste(names(sort(data[i,paste('SDG.',c(2,3,4,5,6,8,12,13), sep='')]/data[i,'FreqT'],decreasing=T))[1:3],collapse='#'),
+                                                                    paste(names(sort(data[i,paste('SDG.',c(2,3,4,5,6,8,12,13), sep='')]/data[i,'FreqT'],decreasing=T))[1:3],collapse='#'))))},mc.cores=cores))
 
 data=cbind(data,SDG)
 
