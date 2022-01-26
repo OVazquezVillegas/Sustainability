@@ -4,10 +4,7 @@
 library(bibliometrix)
 library(textmineR)
 library(dplyr)
-<<<<<<< HEAD
 library(ggplot2)
-=======
->>>>>>> 5315639947e2643e8da6404528a40991ce7874a6
 
 #1 Selecting sample
 
@@ -71,11 +68,7 @@ dtm_2 <- CreateDtm(doc_vec = SDG_terms$V1,
                 verbose = FALSE, 
                 cpus = 2) 
 
-<<<<<<< HEAD
 dtm_2_3 <- CreateDtm(doc_vec = SDG_terms$V1, 
-=======
-dtm_3 <- CreateDtm(doc_vec = SDG_terms$V1, 
->>>>>>> 5315639947e2643e8da6404528a40991ce7874a6
                    ngram_window = c(2, 3),
                    stopword_vec = stopwords::stopwords("en"),
                    lower = TRUE, 
@@ -88,7 +81,6 @@ dtm_3 <- CreateDtm(doc_vec = SDG_terms$V1,
 tf <- TermDocFreq(dtm = dtm)
 tf_2 <- TermDocFreq(dtm = dtm_2)
 tf_3 <- TermDocFreq(dtm = dtm_3)
-<<<<<<< HEAD
 
 
 # Unspervised machine learning model (LDA)
@@ -146,5 +138,3 @@ ggplot(coherence_mat, aes(x = k, y = coherence)) +
   scale_x_continuous(breaks = seq(1,20,1)) + ylab("Coherence")
 
 
-=======
->>>>>>> 5315639947e2643e8da6404528a40991ce7874a6
